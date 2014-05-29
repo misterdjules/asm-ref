@@ -2,3 +2,10 @@
 *.sublime*
 asm-ref
 *.sqlite
+*.suo
+*.sdf
+*.opensdf
+*.filters
+*.user
+Debug
+Release
