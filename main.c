@@ -2,50 +2,45 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <sqlite3.h>
+#include <intel_x86_ref.h>
 
 #define X86_REF_DATABASE_PATH "./x86-ref.sqlite"
-#define SELECT_MNEMONIC_FROM_INSTRUCTIONS "SELECT mnemonic FROM instructions"
 
 int main(int argc, char *argv[])
 {
-	sqlite3* db        = NULL;
-	int rc             = -1;
-	sqlite3_stmt* stmt = NULL;
+	ref_database_t* ref_db                 = x86_ref_open_database(X86_REF_DATABASE_PATH);
+	instructions_list_t* instructions_list = NULL;
+	instruction_t* instruction             = NULL;
 
-	rc = sqlite3_open("x86.sqlite", &db);
-	if (rc != SQLITE_OK)
+	if (!ref_db)
 	{
-		fprintf(stderr, "Could not open database at path [%s], reason: %s\n", 
-				X86_REF_DATABASE_PATH,
-				sqlite3_errmsg(db));
-		sqlite3_close(db);
+		fprintf(stderr, "Could not open x86 reference database, aborting\n");
 		return EXIT_FAILURE;
 	}
 
-	rc = sqlite3_prepare_v2(db,
-						 	SELECT_MNEMONIC_FROM_INSTRUCTIONS,
-						 	strlen(SELECT_MNEMONIC_FROM_INSTRUCTIONS),
-						 	&stmt,
-						 	NULL);
-	if (rc != SQLITE_OK)
+	instructions_list = x86_ref_list_instructions(ref_db);
+	if (!instructions_list)
 	{
-		fprintf(stderr, "Could not prepare statement [%s], reason: %s\n",
-				SELECT_MNEMONIC_FROM_INSTRUCTIONS,
-				sqlite3_errmsg(db));
-		sqlite3_close(db);
+		fprintf(stderr, "Couldn't list x86 instructions\n");
 		return EXIT_FAILURE;
 	}
 
-	while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
+	while (instruction = x86_ref_next_instruction_from_list(&instructions_list))
 	{
-		fprintf(stdout, "MNEMONIC: %s\n", sqlite3_column_text(stmt, 0));
+		fprintf(stdout, "Instruction: %s\n", x86_ref_get_instruction_mnemonic(instruction));
+		fprintf(stdout, "OpCode: %s\n", x86_ref_get_instruction_opcode(instruction));
+		fprintf(stdout, "Short desc: %s\n", x86_ref_get_instruction_short_desc(instruction));
 	}
 
-	if (rc != SQLITE_DONE)
+	instruction = x86_ref_get_instruction_by_mnemonic(ref_db, "ADD");
+	if (instruction)
 	{
-		fprintf(stderr, "Could not execute statement, reason: %s\n", sqlite3_errmsg(db));
-		sqlite3_close(db);
+		fprintf(stdout, "ADD: %s\n", x86_ref_get_instruction_short_desc(instruction));
+	}
+
+	if (x86_ref_close_database(&ref_db) != X86_REF_OK)
+	{
+		fprintf(stderr, "Couldn't close x86 ref database, reason: %s.\n", x86_ref_errmsg(ref_db));
 		return EXIT_FAILURE;
 	}
 
