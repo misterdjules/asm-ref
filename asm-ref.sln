@@ -4,8 +4,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asm-ref", "asm-ref.vcxproj", "{DB78714B-98E4-482B-9664-206275560293}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4D128ECC-4989-4BEF-8AAA-A9448A9A5ECF} = {4D128ECC-4989-4BEF-8AAA-A9448A9A5ECF}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib-intel-x86-ref", "win32\lib-intel-x86-ref\lib-intel-x86-ref.vcxproj", "{4D128ECC-4989-4BEF-8AAA-A9448A9A5ECF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{214EC40E-54F4-4ED8-8548-C42365D1314F} = {214EC40E-54F4-4ED8-8548-C42365D1314F}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SQLite", "win32\SQLite\SQLite.vcxproj", "{214EC40E-54F4-4ED8-8548-C42365D1314F}"
 EndProject
