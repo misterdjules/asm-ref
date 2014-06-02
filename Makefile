@@ -1,3 +1,5 @@
+include mktools/show_make_rules.mk
+
 include_dirs := libs/intel-x86-ref
 lib_x86_ref := ./libs/intel-x86-ref
 
@@ -9,7 +11,7 @@ CFLAGS += -g -Wall -pedantic
 
 LDFLAGS += -L$(lib_x86_ref) -Wl,--rpath,$(lib_x86_ref)
 
-.PHONY: all asm-ref $(lib_x86_ref) clean clean-asm-ref clean-tools clean_lib_x86_ref
+.PHONY: all $(lib_x86_ref) clean clean-asm-ref clean-tools clean_lib_x86_ref
 
 all: asm-ref
 

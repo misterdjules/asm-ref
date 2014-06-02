@@ -18,14 +18,14 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	instructions_list = x86_ref_list_instructions(ref_db);
+	instructions_list = x86_ref_get_all_instructions(ref_db);
 	if (!instructions_list)
 	{
 		fprintf(stderr, "Couldn't list x86 instructions\n");
 		return EXIT_FAILURE;
 	}
 
-	while (instruction = x86_ref_next_instruction_from_list(&instructions_list))
+	while ((instruction = x86_ref_next_instruction_from_list(&instructions_list)) != NULL)
 	{
 		fprintf(stdout, "Instruction: %s\n", x86_ref_get_instruction_mnemonic(instruction));
 		fprintf(stdout, "OpCode: %s\n", x86_ref_get_instruction_opcode(instruction));
