@@ -45,7 +45,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\dev\asm-ref\win32\SQLite\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>X86_REF_EXPORTING</PreprocessorDefinitions>
+      <PreprocessorDefinitions>X86_REF_DLL_EXPORT</PreprocessorDefinitions>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
     </ClCompile>
     <Link>
@@ -62,7 +62,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\dev\asm-ref\win32\SQLite\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>X86_REF_EXPORTING</PreprocessorDefinitions>
+      <PreprocessorDefinitions>X86_REF_DLL_EXPORT</PreprocessorDefinitions>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
     </ClCompile>
     <Link>
