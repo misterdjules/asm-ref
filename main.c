@@ -35,7 +35,8 @@ int main(int argc, char *argv[])
 	instruction = x86_ref_get_instruction_by_mnemonic(ref_db, "ADD");
 	if (instruction)
 	{
-		fprintf(stdout, "ADD: %s\n", x86_ref_get_instruction_short_desc(instruction));
+		fprintf(stdout, "ADD short description: %s\n", x86_ref_get_instruction_short_desc(instruction));
+		fprintf(stdout, "ADD synopsis: %s\n", x86_ref_get_instruction_synopsis(instruction));
 	}
 
 	if (x86_ref_close_database(&ref_db) != X86_REF_OK)
