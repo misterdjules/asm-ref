@@ -60,8 +60,6 @@ const char* sqlite_helper_sql_statement_to_string(const sql_statement_t* sql_sta
 	if (!sql_statement)
 		return NULL;
 
-	string_size = 1; /* 0 byte termination */
-
 	string_size += strlen(sql_statement->statement);
 	string_size += 1; /* space after SQL statement */
 
@@ -79,16 +77,17 @@ const char* sqlite_helper_sql_statement_to_string(const sql_statement_t* sql_sta
 		++column_names;
 	}
 
-	string_size += strlen(FROM) + 1;
-	string_size += strlen(sql_statement->table_name) + 1; /* space after FROM */
+	string_size += strlen(FROM) + 1; /* +1 for space after column names */
+	string_size += strlen(sql_statement->table_name) + 1; /* +1 for space after FROM */
 
 	if (sql_statement->where_clause)
 	{
-		string_size += strlen(WHERE) + 1; /* space after table's name */
-		string_size += strlen(sql_statement->where_clause);
+		string_size += strlen(WHERE) + 1; /* +1 for space after table's name */
+		string_size += strlen(sql_statement->where_clause) + 1; /* +1 for space after "WHERE" */
 	}
 
-	string_size += 1; /* semi-colon at the end */
+	++string_size; /* semi-colon at the end */
+	++string_size; /* NULL character termination */
 
 	debug(debug_ctx, "String size: %d\n", string_size);
 
