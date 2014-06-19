@@ -8,9 +8,10 @@
 
 int main(int argc, char *argv[])
 {
-	ref_database_t* ref_db                 = x86_ref_open_database(X86_REF_DATABASE_PATH);
-	instructions_list_t* instructions_list = NULL;
-	instruction_t* instruction             = NULL;
+	ref_database_t* ref_db                      = x86_ref_open_database(X86_REF_DATABASE_PATH);
+	instructions_list_t* instructions_list      = NULL;
+	instructions_list_t* instructions_list_iter = NULL;
+	instruction_t* instruction                  = NULL;
 
 	if (!ref_db)
 	{
@@ -18,25 +19,36 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	instructions_list = x86_ref_get_all_instructions(ref_db);
+	instructions_list_iter = instructions_list = x86_ref_get_all_instructions(ref_db);
 	if (!instructions_list)
 	{
 		fprintf(stderr, "Couldn't list x86 instructions\n");
 		return EXIT_FAILURE;
 	}
 
-	while ((instruction = x86_ref_next_instruction_from_list(&instructions_list)) != NULL)
+	while ((instruction = x86_ref_next_instruction_from_list(&instructions_list_iter)) != NULL)
 	{
 		fprintf(stdout, "Instruction: %s\n", x86_ref_get_instruction_mnemonic(instruction));
 		fprintf(stdout, "OpCode: %s\n", x86_ref_get_instruction_opcode(instruction));
 		fprintf(stdout, "Short desc: %s\n", x86_ref_get_instruction_short_desc(instruction));
 	}
 
+	x86_ref_destroy_instructions_list(instructions_list);
+	instructions_list = NULL;
+
 	instruction = x86_ref_get_instruction_by_mnemonic(ref_db, "ADD");
 	if (instruction)
 	{
 		fprintf(stdout, "ADD short description: %s\n", x86_ref_get_instruction_short_desc(instruction));
 		fprintf(stdout, "ADD synopsis: %s\n", x86_ref_get_instruction_synopsis(instruction));
+	}
+
+	instructions_list_iter = instructions_list = x86_ref_search_instructions_by_mnemonic(ref_db, "A");
+	while ((instruction = x86_ref_next_instruction_from_list(&instructions_list_iter)) != NULL)
+	{
+		fprintf(stdout, "Instruction: %s\n", x86_ref_get_instruction_mnemonic(instruction));
+		fprintf(stdout, "OpCode: %s\n", x86_ref_get_instruction_opcode(instruction));
+		fprintf(stdout, "Short desc: %s\n", x86_ref_get_instruction_short_desc(instruction));
 	}
 
 	if (x86_ref_close_database(&ref_db) != X86_REF_OK)
