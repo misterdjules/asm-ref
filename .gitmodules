@@ -4,3 +4,6 @@
 [submodule "deps/libx86-ref"]
 	path = deps/libx86-ref
 	url = git://github.com/misterdjules/libx86-ref.git
+[submodule "deps/mktools"]
+	path = deps/mktools
+	url = git://github.com/misterdjules/mktools.git

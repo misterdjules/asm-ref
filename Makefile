@@ -1,6 +1,4 @@
-include mktools/show_make_rules.mk
-
-
+include deps/mktools/show_make_rules.mk
 
 lib_x86_ref := ./deps/libx86-ref
 lib_debug   := ./deps/debug
