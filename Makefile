@@ -2,7 +2,7 @@ include mktools/show_make_rules.mk
 
 
 
-lib_x86_ref := ./libs/intel-x86-ref
+lib_x86_ref := ./deps/libx86-ref
 lib_debug   := ./deps/debug
 
 include_dirs := $(lib_x86_ref)
