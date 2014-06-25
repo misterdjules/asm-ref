@@ -1,0 +1,3 @@
+[submodule "deps/debug"]
+	path = deps/debug
+	url = git://github.com/misterdjules/debug.git

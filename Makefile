@@ -3,7 +3,7 @@ include mktools/show_make_rules.mk
 
 
 lib_x86_ref := ./libs/intel-x86-ref
-lib_debug   := ./libs/debug
+lib_debug   := ./deps/debug
 
 include_dirs := $(lib_x86_ref)
 
