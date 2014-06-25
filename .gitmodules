@@ -1,3 +1,6 @@
 [submodule "deps/debug"]
 	path = deps/debug
 	url = git://github.com/misterdjules/debug.git
+[submodule "deps/libx86-ref"]
+	path = deps/libx86-ref
+	url = git://github.com/misterdjules/libx86-ref.git
