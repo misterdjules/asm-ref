@@ -1,7 +1,11 @@
 include mktools/show_make_rules.mk
 
-include_dirs := libs/intel-x86-ref
+
+
 lib_x86_ref := ./libs/intel-x86-ref
+lib_debug   := ./libs/debug
+
+include_dirs := $(lib_x86_ref)
 
 sources := main.c
 objects := $(subst .c,.o,$(sources))
@@ -24,7 +28,7 @@ $(lib_x86_ref):
 main.o: main.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-clean: clean-asm-ref clean-tools clean_lib_x86_ref
+clean: clean-asm-ref clean-tools clean_lib_x86_ref clean_debug
 
 clean-asm-ref:
 	rm -f *.o asm-ref
@@ -34,3 +38,5 @@ clean-tools:
 clean_lib_x86_ref:
 	$(MAKE) --directory=$(lib_x86_ref) clean
 
+clean_debug:
+	$(MAKE) --directory=$(lib_debug) clean
