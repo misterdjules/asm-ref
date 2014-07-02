@@ -76,19 +76,20 @@ async.waterfall([
 		insertErrors = [];
 		var addInstructionStatement = db.prepare('INSERT INTO instructions VALUES (?, ?, ?, ?, ?, ?)');
 
-		async.eachSeries(Object.keys(instructions), function (mnemonic, mnemonicDone) {
-			var opcode, synopsis, longDescription, shortDescription,
+		async.eachSeries(instructions, function (instruction, mnemonicDone) {
+			var mnemonic, opcode, synopsis, longDescription, shortDescription,
 				affectedFlags;
 
-			opcode           = instructions[mnemonic].opcode || '';
-			synopsis		 = instructions[mnemonic].synopsis;
-			longDescription  = instructions[mnemonic].description;
+			mnemonic 		 = instruction.mnemonic;
+			opcode           = instruction.opcode 		|| '';
+			synopsis		 = instruction.synopsis 	|| '';
+			longDescription  = instruction.description 	|| '';
 
 			if (longDescription) {
 				shortDescription = longDescription.split('.')[0] + '.';
 			}
 
-			affectedFlags = instructions[mnemonic].affectedFlags;
+			affectedFlags = instruction.affectedFlags;
 
 			async.eachSeries(mnemonic.split('/'), function (actualMnemonic, actualMnemonicDone) {
 				if (actualMnemonic.length > 0) {
