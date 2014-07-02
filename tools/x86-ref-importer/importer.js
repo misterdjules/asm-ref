@@ -3,6 +3,7 @@ var db                = null;
 var intelX86RefParser = require('./intel-x86-ref-parser');
 var async			  = require('async');
 var child_process     = require('child_process');
+var debug			  = require('debug')('x86_ref_importer');
 
 var DROP_INSTRUCTIONS_TABLE = 'DROP TABLE IF EXISTS instructions;';
 var X86_REF_PDF_FILE_PATH   = './x86.pdf'
@@ -42,6 +43,12 @@ async.waterfall([
 	function openDatabase(callback) {
 		console.log('Opening database...');
 		db = new sqlite3.Database('x86-ref.sqlite', callback);
+
+		if (db) {
+			db.on('trace', function (sqlStatement) {
+				debug('SQL statement: ', sqlStatement);
+			});
+		}
 	},
 	function dropTable(callback) {
 		console.log('Dropping existing instructions table...');
@@ -66,10 +73,13 @@ async.waterfall([
 	function insertData(instructions, callback) {
 		console.log('Inserting new data...');
 
+		insertErrors = [];
 		var addInstructionStatement = db.prepare('INSERT INTO instructions VALUES (?, ?, ?, ?, ?, ?)');
-		var opcode, synopsis, longDescription, shortDescription,
-			affectedFlags;
-		for (mnemonic in instructions) {
+
+		async.eachSeries(Object.keys(instructions), function (mnemonic, mnemonicDone) {
+			var opcode, synopsis, longDescription, shortDescription,
+				affectedFlags;
+
 			opcode           = instructions[mnemonic].opcode || '';
 			synopsis		 = instructions[mnemonic].synopsis;
 			longDescription  = instructions[mnemonic].description;
@@ -78,17 +88,46 @@ async.waterfall([
 				shortDescription = longDescription.split('.')[0] + '.';
 			}
 
-			affectedFlags    = instructions[mnemonic].affectedFlags;
+			affectedFlags = instructions[mnemonic].affectedFlags;
 
-			addInstructionStatement.run(mnemonic,
-										opcode,
-										synopsis,
-										shortDescription,
-										longDescription,
-										affectedFlags);
+			async.eachSeries(mnemonic.split('/'), function (actualMnemonic, actualMnemonicDone) {
+				if (actualMnemonic.length > 0) {
+					debug('Adding menmonic: ', actualMnemonic);
+					addInstructionStatement.run(actualMnemonic,
+												opcode,
+												synopsis,
+												shortDescription,
+												longDescription,
+												affectedFlags,
+												function (err) {
+													if (err) {
+														insertErrors.push({ mnemonic: actualMnemonic, reason: err});
+													}
+
+													actualMnemonicDone();
+												});
+				} else {
+					actualMnemonicDone();
+				}
+			}, function (err) {
+				mnemonicDone();
+			});
+		}, function (err) {
+			callback(null, insertErrors);
+		});
+	},
+	function reportInsertErrors(insertErrors, callback) {
+		if (insertErrors) {
+			if (insertErrors.length > 0) {
+				console.log('WARNING: there were some errors when inserting data.');
+				insertErrors.forEach(function (error) {
+					console.log("Could not insert instruction with mnemonic [%s], reason: ",
+								error.mnemonic,
+								error.reason);
+				});
+			}
 		}
-
-		addInstructionStatement.finalize(callback);
+		callback();
 	},
 	function cleanup(callback) {
 		var rm;

@@ -4,10 +4,10 @@ var debug	   = require('debug')('x86-ref-parser');
 
 var instructions       = {};
 
-var INSTRUCTION_HEADER_MARKER = /^[^\s]+\u0097[^\s]+/;
+var INSTRUCTION_HEADER_MARKER    = /^[^\s]+\u0097[^\s]+/;
 var INSTRUCTION_HEADER_SEPARATOR = '\u0097';
 
-var DESCRIPTION_HEADER = /^Description$/;
+var DESCRIPTION_HEADER    = /^Description$/;
 var FLAGS_AFFECTED_HEADER = /^Flags Affected$/;
 
 function parse(filePath, callback) {
@@ -16,7 +16,7 @@ function parse(filePath, callback) {
 	var mnemonicAndSynopsis = null;
 	var menmonic, synopsis;
 	var chunk;
-	var lineStr = null;
+	var previousLineEmpty = false;
 
 	var parsingDescription    = false;
 	var parsingNewInstruction = false;
@@ -55,7 +55,7 @@ function parse(filePath, callback) {
 				lineStream.unshift(chunk);
 			}
 		} else {
-			if (INSTRUCTION_HEADER_MARKER.test(line)) {
+			if (previousLineEmpty && INSTRUCTION_HEADER_MARKER.test(line)) {
 				mnemonicAndSynopsis = line.split(INSTRUCTION_HEADER_SEPARATOR);
 				currentInstructionMnemonic = mnemonicAndSynopsis[0];
 				currentInstructionSynopsis = mnemonicAndSynopsis[1];
@@ -69,6 +69,12 @@ function parse(filePath, callback) {
 				}
 
 			}
+		}
+
+		if (line === '') {
+			previousLineEmpty = true;
+		} else {
+			previousLineEmpty = false;
 		}
 	});
 
