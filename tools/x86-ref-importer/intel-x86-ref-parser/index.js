@@ -1,7 +1,7 @@
 var LineStream = require('line-stream');
 var fs         = require('fs');
-var debug	   = require('debug')('x86-ref-parser:debug');
-var info       = require('debug')('x86-ref-parser:info');
+var debug      = require('debug')('x86-ref-parser:debug');
+var trace      = require('debug')('x86-ref-parser:trace');
 
 var assert     = require('assert');
 
@@ -35,30 +35,21 @@ function parse(filePath, callback) {
 	var parserState = [];
 
 	lineStream.on('end', function () {
-		info('Got end on lineStream, parsing done!');
+		debug('Got end on lineStream, parsing done!');
 
-		lineStreamEnd = true;
-		if (!parsingChunks) {
-			callback(null, instructions);
-		}
+		callback(null, instructions);
 	});
 
 	lineStream.on('error', function (err) {
-		info('Got error on lineStream, parsing done:', err);
+		debug('Got error on lineStream, parsing done:', err);
 
 		callback(err);
 	})
 
 	lineStream.on('readable', function () {
-		debug('readable emitted, calling doParse...');
+		trace('readable emitted, calling doParse...');
 
-		parsingChunks = true;
 		doParse(lineStream, instructions, parserState);
-		parsingChunks = false;
-		if (lineStreamEnd) {
-			info('Done parsing, instructions:', instructions);
-			callback(null, instructions);
-		}
 	});
 
 	fileStream.pipe(lineStream)
@@ -68,12 +59,12 @@ function doParse(lineStream, instructions, parserState) {
 	var chunk, mnemonicAndSynopsis, mnemonic, synopsis;
 
 	while ((chunk = lineStream.read()) !== null) {
-		debug('Chunk:', chunk);
+		trace('Chunk:', chunk);
 		lineStr = chunk.toString();
 
 		if (startsAffectedFlags(lineStr)) {
-			debug('Detected start of affected flags!');
-			debug('Parser state:, ', parserState);
+			trace('Detected start of affected flags!');
+			trace('Parser state:, ', parserState);
 
 			popParserState(parserState);
 			parserState.push({state: PARSING_AFFECTED_FLAGS_STATE, string: ''});
@@ -81,8 +72,8 @@ function doParse(lineStream, instructions, parserState) {
 		}
 
 		if (startsOperation(lineStr)) {
-			debug('Detected start of operation!');
-			debug('Parser state:, ', parserState);
+			trace('Detected start of operation!');
+			trace('Parser state:, ', parserState);
 
 			popParserState(parserState);
 			parserState.push({state: PARSING_OPERATION_STATE, string: ''});
@@ -90,8 +81,8 @@ function doParse(lineStream, instructions, parserState) {
 		}
 
 		if (startsDescription(lineStr)) {
-			debug('Detected start of description!');
-			debug('Parser state:', parserState);
+			trace('Detected start of description!');
+			trace('Parser state:', parserState);
 
 			popParserState(parserState);
 			parserState.push({state: PARSING_DESCRIPTION_STATE, string: ''});
@@ -99,8 +90,8 @@ function doParse(lineStream, instructions, parserState) {
 		}
 
 		if (mnemonicAndSynopsis = startsNewInstruction(lineStr, parserState)) {
-			debug('Detected start of new instruction!');
-			debug('Parser state:', parserState);
+			trace('Detected start of new instruction!');
+			trace('Parser state:', parserState);
 
 			if (isParsingInstruction(parserState)) {
 				popParserState(parserState);
@@ -118,8 +109,8 @@ function doParse(lineStream, instructions, parserState) {
 		}
 
 		if (isParsingInstruction(parserState)) {
-			debug('Adding string to current parserState:', lineStr);
-			debug('Parser state:', parserState);
+			trace('Adding string to current parserState:', lineStr);
+			trace('Parser state:', parserState);
 
 			if (parserState[1].string && parserState[1].string.length) {
 				parserState[1].string += ' ' + lineStr;
@@ -143,8 +134,8 @@ function popParserState(parserState) {
 }
 
 function createInstructions(instructionParserState) {
-	info('Creating instruction [%s]:', instructionParserState.mnemonic);
-	info('Parser state:', instructionParserState);
+	trace('Creating instruction [%s]:', instructionParserState.mnemonic);
+	trace('Parser state:', instructionParserState);
 
 	instructions = [];
 
